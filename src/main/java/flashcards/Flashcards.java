@@ -105,7 +105,7 @@ public class Flashcards {
 
 
     private boolean checkAnswer(String definition, String answer) {
-        return Objects.equals(definition, answer);
+        return definition.equals(answer);
     }
 
 
