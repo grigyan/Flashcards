@@ -1,8 +1,11 @@
 package flashcards;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static flashcards.Main.MENU;
 
@@ -10,8 +13,13 @@ public class Flashcards {
     private final String DATA_FILE_PATH = "src/main/java/flashcards/IOFiles/%s";
     private final Map<String, String> flashcards = new LinkedHashMap<>();
     private final Map<String, Integer> mistakes = new HashMap<>();
-    public final StringBuilder log = new StringBuilder();
+    private final StringBuilder log = new StringBuilder();
 
+
+    @VisibleForTesting
+    public Map<String, Integer> getMistakes() {
+        return mistakes;
+    }
 
     public void printAndAppendToLog(String string) {
         log.append(string).append(System.lineSeparator());
@@ -105,11 +113,12 @@ public class Flashcards {
 
 
     private boolean checkAnswer(String definition, String answer) {
-        return definition.equals(answer);
+        return Objects.equals(definition, answer);
     }
 
 
-    private String findByDefinition(String userDefinition, Map<String, String> flashcards) {
+    @VisibleForTesting
+    public String findByDefinition(String userDefinition, Map<String, String> flashcards) { //find by value in map
         for (Map.Entry<String, String> card : flashcards.entrySet()) {
             String cardTerm = card.getKey();
             String cardDefinition = card.getValue();
@@ -199,24 +208,37 @@ public class Flashcards {
             return;
         }
 
+        List<String> mistakenTermsList = mistakenTermsList(mistakes);
+
+        if (mistakenTermsList.isEmpty()) {
+            printAndAppendToLog("There are no cards with errors.");
+        } else if (mistakenTermsList.size() == 1) {
+            String term = mistakenTermsList.get(0);
+
+            printAndAppendToLog(String.format("The hardest card is \"%s\". You have %d errors answering it.",
+                    term, mistakes.get(term)));
+        } else {
+            String mistakenTermsToString = mistakenTermsList.stream()
+                    .map(s -> "\"" + s + "\"")
+                    .collect(Collectors.joining(", ", "", "."));
+            String firstTerm = mistakenTermsList.get(0);
+            printAndAppendToLog(String.format("The hardest cards are %s You have %d errors answering them.",
+                    mistakenTermsToString, mistakes.get(firstTerm)));
+        }
+    }
+
+    @VisibleForTesting
+    public List<String> mistakenTermsList(Map<String, Integer> mistakes) {
         int maxMistakes = Collections.max(mistakes.values());
 
-        var mistakenTerms = mistakes.entrySet().stream()
+        if (maxMistakes == 0) {
+            return List.of();
+        }
+
+        return mistakes.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(maxMistakes))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
-
-        var mistakenTermsToString = mistakenTerms.stream()
-                .map(s -> "\"" + s + "\"")
-                .collect(Collectors.joining(", ", "", "."));
-
-        if (mistakenTerms.size() == 0 || maxMistakes == 0) {
-            printAndAppendToLog("There are no cards with errors.");
-        } else if (mistakenTerms.size() == 1) {
-            printAndAppendToLog(String.format("The hardest card is \"%s\". You have %d errors answering it.", mistakenTerms.get(0), maxMistakes));
-        } else {
-            printAndAppendToLog(String.format("The hardest cards are %s You have %d errors answering them.", mistakenTermsToString, maxMistakes));
-        }
     }
 
 
