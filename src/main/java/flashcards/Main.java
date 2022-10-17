@@ -27,7 +27,7 @@ public class Main {
 
         loop:
         while (true) {
-            flashcards.printAndAppendToLog(MENU);
+            flashcards.getLog().printAndAppendToLog(MENU);
             String input = scanner.nextLine();
 
             switch (input) {

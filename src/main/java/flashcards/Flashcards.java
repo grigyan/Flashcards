@@ -13,70 +13,58 @@ public class Flashcards {
     private final String DATA_FILE_PATH = "src/main/java/flashcards/resources/%s";
     private final Map<String, String> flashcards = new LinkedHashMap<>();
     private final Map<String, Integer> mistakes = new HashMap<>();
-    private final StringBuilder log = new StringBuilder();
+    private final LogHandler log = new LogHandler();
 
+
+    public LogHandler getLog() {
+        return this.log;
+    }
 
     @VisibleForTesting
     public Map<String, Integer> getMistakes() {
         return mistakes;
     }
 
-    public void printAndAppendToLog(String string) {
-        log.append(string).append(System.lineSeparator());
-        System.out.println(string);
-    }
-
-    private String askForInputStringAndAppendToLog() {
-        Scanner scanner = new Scanner(System.in);
-        String input = scanner.nextLine();
-        log.append(input).append(System.lineSeparator());
-        return input;
-    }
-
-    private void appendToLog(String input) {
-        log.append(input).append(System.lineSeparator());
-    }
-
     public void addFlashcard() {
-        appendToLog("add");
-        printAndAppendToLog("The card:");
-        String term = askForInputStringAndAppendToLog();
+        log.appendToLog("add");
+        log.printAndAppendToLog("The card:");
+        String term = log.askForInputStringAndAppendToLog();
         if (flashcards.containsKey(term)) {
-            printAndAppendToLog(String.format("The card \"%s\" already exists.", term));
+            log.printAndAppendToLog(String.format("The card \"%s\" already exists.", term));
             return;
         }
 
-        printAndAppendToLog("The definition of the card:");
-        String definition = askForInputStringAndAppendToLog();
+        log.printAndAppendToLog("The definition of the card:");
+        String definition = log.askForInputStringAndAppendToLog();
         if (flashcards.containsValue(definition)) {
-            printAndAppendToLog(String.format("The definition \"%s\" already exists.", definition));
+            log.printAndAppendToLog(String.format("The definition \"%s\" already exists.", definition));
             return;
         }
 
         flashcards.put(term, definition);
         mistakes.put(term, 0);
-        printAndAppendToLog(String.format("The pair (\"%s\":\"%s\") has been added.", term, definition));
+        log.printAndAppendToLog(String.format("The pair (\"%s\":\"%s\") has been added.", term, definition));
     }
 
 
     public void removeFlashcard() {
-        appendToLog("remove");
-        printAndAppendToLog("Which card?");
-        String input = askForInputStringAndAppendToLog();
+        log.appendToLog("remove");
+        log.printAndAppendToLog("Which card?");
+        String input = log.askForInputStringAndAppendToLog();
         if (flashcards.containsKey(input)) {
             flashcards.remove(input);
             mistakes.remove(input);
-            printAndAppendToLog("The card has been removed.");
+            log.printAndAppendToLog("The card has been removed.");
         } else {
-            printAndAppendToLog(String.format("Can't remove \"%s\": there is no such card.", input));
+            log.printAndAppendToLog(String.format("Can't remove \"%s\": there is no such card.", input));
         }
     }
 
 
     public void askFlashcards() {
-        appendToLog("ask");
-        printAndAppendToLog("How many times to ask?");
-        int count = Integer.parseInt(askForInputStringAndAppendToLog());
+        log.appendToLog("ask");
+        log.printAndAppendToLog("How many times to ask?");
+        int count = Integer.parseInt(log.askForInputStringAndAppendToLog());
         int asked = 0;
         var iterator = flashcards.entrySet().iterator();
 
@@ -94,20 +82,20 @@ public class Flashcards {
 
 
     private void askNextQuestion(Map.Entry<String, String> flashcard) {
-        printAndAppendToLog(String.format("Print the definition of \"%s\":", flashcard.getKey()));
+        log.printAndAppendToLog(String.format("Print the definition of \"%s\":", flashcard.getKey()));
         String rightAnswer = flashcard.getValue();
-        String userAnswer = askForInputStringAndAppendToLog();
+        String userAnswer = log.askForInputStringAndAppendToLog();
 
         if (checkAnswer(rightAnswer, userAnswer)) {
-            printAndAppendToLog("Correct!");
+            log.printAndAppendToLog("Correct!");
         } else if(flashcards.containsValue(userAnswer)) {
             String otherTerm = findByDefinition(userAnswer, flashcards);
-            printAndAppendToLog(String.format("Wrong. The right answer is \"%s\", but your definition is correct for \"%s\"",
+            log.printAndAppendToLog(String.format("Wrong. The right answer is \"%s\", but your definition is correct for \"%s\"",
                     flashcard.getValue(), otherTerm));
             mistakes.replace(flashcard.getKey(), mistakes.get(flashcard.getKey()) + 1);
         } else {
             mistakes.replace(flashcard.getKey(), mistakes.get(flashcard.getKey()) + 1);
-            printAndAppendToLog(String.format("Wrong. The right answer is \"%s\".", flashcard.getValue()));
+            log.printAndAppendToLog(String.format("Wrong. The right answer is \"%s\".", flashcard.getValue()));
         }
     }
 
@@ -144,25 +132,25 @@ public class Flashcards {
                 mistakes.put(data[0], Integer.parseInt(data[2]));
                 count++;
             }
-            printAndAppendToLog(String.format("%d cards have been loaded.", count));
+            log.printAndAppendToLog(String.format("%d cards have been loaded.", count));
         } catch (FileNotFoundException e) {
-            printAndAppendToLog("File not found");
+            log.printAndAppendToLog("File not found");
         }
     }
 
     public void importFlashcards() {
-        appendToLog("import");
-        printAndAppendToLog("File name:");
-        String fileName = askForInputStringAndAppendToLog();
+        log.appendToLog("import");
+        log.printAndAppendToLog("File name:");
+        String fileName = log.askForInputStringAndAppendToLog();
 
         importFlashcards(fileName);
     }
 
 
     public void exportFlashcards() {
-        appendToLog("export");
-        printAndAppendToLog("File name:");
-        String fileName = askForInputStringAndAppendToLog();
+        log.appendToLog("export");
+        log.printAndAppendToLog("File name:");
+        String fileName = log.askForInputStringAndAppendToLog();
 
         exportFlashcards(fileName);
     }
@@ -179,21 +167,21 @@ public class Flashcards {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        printAndAppendToLog(String.format("%d cards have been saved.", flashcards.size()));
+        log.printAndAppendToLog(String.format("%d cards have been saved.", flashcards.size()));
     }
 
 
     public void saveLog() {
-        appendToLog("log");
-        printAndAppendToLog("File name:");
-        String fileName = askForInputStringAndAppendToLog();
+        log.appendToLog("log");
+        log.printAndAppendToLog("File name:");
+        String fileName = log.askForInputStringAndAppendToLog();
         String filePath = String.format(DATA_FILE_PATH, fileName);
 
         File file = new File(filePath);
         try(PrintWriter writer = new PrintWriter(file)) {
             file.createNewFile();
-            printAndAppendToLog("The log has been saved");
-            appendToLog(MENU);
+            log.printAndAppendToLog("The log has been saved");
+            log.appendToLog(MENU);
             writer.printf(log.toString());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -202,27 +190,27 @@ public class Flashcards {
 
 
     public void getHardestCard() {
-        appendToLog("hardest card");
+        log.appendToLog("hardest card");
         if (mistakes.isEmpty()) {
-            printAndAppendToLog("There are no cards with errors.");
+            log.printAndAppendToLog("There are no cards with errors.");
             return;
         }
 
         List<String> mistakenTermsList = mistakenTermsList(mistakes);
 
         if (mistakenTermsList.isEmpty()) {
-            printAndAppendToLog("There are no cards with errors.");
+            log.printAndAppendToLog("There are no cards with errors.");
         } else if (mistakenTermsList.size() == 1) {
             String term = mistakenTermsList.get(0);
 
-            printAndAppendToLog(String.format("The hardest card is \"%s\". You have %d errors answering it.",
+            log.printAndAppendToLog(String.format("The hardest card is \"%s\". You have %d errors answering it.",
                     term, mistakes.get(term)));
         } else {
             String mistakenTermsToString = mistakenTermsList.stream()
                     .map(s -> "\"" + s + "\"")
                     .collect(Collectors.joining(", ", "", "."));
             String firstTerm = mistakenTermsList.get(0);
-            printAndAppendToLog(String.format("The hardest cards are %s You have %d errors answering them.",
+            log.printAndAppendToLog(String.format("The hardest cards are %s You have %d errors answering them.",
                     mistakenTermsToString, mistakes.get(firstTerm)));
         }
     }
@@ -243,11 +231,11 @@ public class Flashcards {
 
 
     public void resetStats() {
-        appendToLog("reset stats");
+        log.appendToLog("reset stats");
         for (Map.Entry<String, Integer> entry : mistakes.entrySet()) {
             mistakes.replace(entry.getKey(), 0);
         }
-        printAndAppendToLog("Card statistics have been reset.");
+        log.printAndAppendToLog("Card statistics have been reset.");
     }
 
 }
