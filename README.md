@@ -21,10 +21,10 @@ that you want to delete.
 
 3. `import`: Import cards from the import file that you specify. You should
 enter the full name of the file including the file type (e.g. `importFile.txt`).
-The file should be located in `src/main/java/flashcards/IOFiles` folder.
+The file should be located in `src/main/java/flashcards/resources` folder.
 
 4. `export`: Export cards to the file that yoyu specify. File will be
-saved in `src/main/java/flashcards/IOFiles` directory. You should provide the
+saved in `src/main/java/flashcards/resources` directory. You should provide the
 full name for the file (e.g `exportFile.txt`).
 
 5. `ask`: Ask you the cards that you created and/or imported. After choosing this
@@ -33,7 +33,7 @@ option, additionally provide number of times you want the program to ask questio
 6. `exit`: Simply exits the program
 
 7. `log`: Saves the log of the program to the file. File will be saved in 
-`src/main/java/flashcards/IOFiles` directory. You should provide full name for
+`src/main/java/flashcards/resources` directory. You should provide full name for
 the file (e.g. `log.txt`).
 
 8. `hardest card`: Program will show you the card that you answered wrong for the highest number of times.

@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import static flashcards.Main.MENU;
 
 public class Flashcards {
-    private final String DATA_FILE_PATH = "src/main/java/flashcards/IOFiles/%s";
+    private final String DATA_FILE_PATH = "src/main/java/flashcards/resources/%s";
     private final Map<String, String> flashcards = new LinkedHashMap<>();
     private final Map<String, Integer> mistakes = new HashMap<>();
     private final StringBuilder log = new StringBuilder();
