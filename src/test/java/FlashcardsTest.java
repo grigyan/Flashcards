@@ -1,4 +1,5 @@
 import flashcards.Flashcards;
+import flashcards.util.ImportFlashcards;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -54,7 +55,9 @@ public class FlashcardsTest {
     public void shouldResetStats() {
         // given
         Flashcards cards = new Flashcards();
-        cards.importFlashcards("ImportForTests_1.txt");
+        ImportFlashcards importer = new ImportFlashcards(cards);
+
+        importer.importFlashcards("ImportForTests_1.txt");
         // when
         cards.resetStats();
         // then

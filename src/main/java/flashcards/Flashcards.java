@@ -1,23 +1,24 @@
 package flashcards;
 
 import com.google.common.annotations.VisibleForTesting;
+import flashcards.util.ImportFlashcards;
 
-import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static flashcards.Main.MENU;
 
 public class Flashcards {
-    private final String DATA_FILE_PATH = "src/main/java/flashcards/resources/%s";
     private final Map<String, String> flashcards = new LinkedHashMap<>();
     private final Map<String, Integer> mistakes = new HashMap<>();
     private final LogHandler log = new LogHandler();
+    private final ImportFlashcards importFlashcards = new ImportFlashcards(this);
 
 
     public LogHandler getLog() {
         return this.log;
+    }
+
+    public Map<String, String> getFlashcards() {
+        return this.flashcards;
     }
 
     @VisibleForTesting
@@ -71,8 +72,7 @@ public class Flashcards {
         while (asked < count) {
             if (iterator.hasNext()) {
                 askNextQuestion(iterator.next());
-            }
-            else {
+            } else {
                 iterator = flashcards.entrySet().iterator();
                 askNextQuestion(iterator.next());
             }
@@ -88,7 +88,7 @@ public class Flashcards {
 
         if (checkAnswer(rightAnswer, userAnswer)) {
             log.printAndAppendToLog("Correct!");
-        } else if(flashcards.containsValue(userAnswer)) {
+        } else if (flashcards.containsValue(userAnswer)) {
             String otherTerm = findByDefinition(userAnswer, flashcards);
             log.printAndAppendToLog(String.format("Wrong. The right answer is \"%s\", but your definition is correct for \"%s\"",
                     flashcard.getValue(), otherTerm));
@@ -117,75 +117,6 @@ public class Flashcards {
         }
 
         return "";
-    }
-
-
-    public void importFlashcards(String fileName) {
-        String filePath = String.format(DATA_FILE_PATH, fileName);
-        File file = new File(filePath);
-
-        try(Scanner scanner = new Scanner(file)) {
-            int count = 0;
-            while (scanner.hasNext()) {
-                String[] data = scanner.nextLine().split(":");
-                flashcards.put(data[0], data[1]);
-                mistakes.put(data[0], Integer.parseInt(data[2]));
-                count++;
-            }
-            log.printAndAppendToLog(String.format("%d cards have been loaded.", count));
-        } catch (FileNotFoundException e) {
-            log.printAndAppendToLog("File not found");
-        }
-    }
-
-    public void importFlashcards() {
-        log.appendToLog("import");
-        log.printAndAppendToLog("File name:");
-        String fileName = log.askForInputStringAndAppendToLog();
-
-        importFlashcards(fileName);
-    }
-
-
-    public void exportFlashcards() {
-        log.appendToLog("export");
-        log.printAndAppendToLog("File name:");
-        String fileName = log.askForInputStringAndAppendToLog();
-
-        exportFlashcards(fileName);
-    }
-
-    public void exportFlashcards(String fileName) {
-        String filePath = String.format(DATA_FILE_PATH, fileName);
-        File file = new File(filePath);
-
-        try(PrintWriter writer = new PrintWriter(file)) {
-            file.createNewFile();
-            for (Map.Entry<String, String> entry : flashcards.entrySet()) {
-                writer.printf("%s:%s:%s\n", entry.getKey(), entry.getValue(), mistakes.get(entry.getKey()));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        log.printAndAppendToLog(String.format("%d cards have been saved.", flashcards.size()));
-    }
-
-
-    public void saveLog() {
-        log.appendToLog("log");
-        log.printAndAppendToLog("File name:");
-        String fileName = log.askForInputStringAndAppendToLog();
-        String filePath = String.format(DATA_FILE_PATH, fileName);
-
-        File file = new File(filePath);
-        try(PrintWriter writer = new PrintWriter(file)) {
-            file.createNewFile();
-            log.printAndAppendToLog("The log has been saved");
-            log.appendToLog(MENU);
-            writer.printf(log.toString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 

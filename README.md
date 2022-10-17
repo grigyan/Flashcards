@@ -33,7 +33,7 @@ option, additionally provide number of times you want the program to ask questio
 6. `exit`: Simply exits the program
 
 7. `log`: Saves the log of the program to the file. File will be saved in 
-`src/main/java/flashcards/resources` directory. You should provide full name for
+`src/main/java/flashcards/log` directory. You should provide full name for
 the file (e.g. `log.txt`).
 
 8. `hardest card`: Program will show you the card that you answered wrong for the highest number of times.

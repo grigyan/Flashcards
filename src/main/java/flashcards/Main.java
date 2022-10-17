@@ -1,5 +1,8 @@
 package flashcards;
 
+import flashcards.util.ExportFlashcards;
+import flashcards.util.ImportFlashcards;
+
 import java.util.*;
 public class Main {
     public static final String MENU = "Input the action (add, remove, import, export, ask, exit, log, hardest card, reset stats)";
@@ -8,6 +11,9 @@ public class Main {
         String importFile = null;
         String exportFile = null;
         Flashcards flashcards = new Flashcards();
+        ImportFlashcards importer = new ImportFlashcards(flashcards);
+        ExportFlashcards exporter = new ExportFlashcards(flashcards);
+
         Scanner scanner = new Scanner(System.in);
 
         for (int i = 0; i < args.length - 1; i++) {
@@ -21,7 +27,7 @@ public class Main {
         }
 
         if (importFile != null) {
-            flashcards.importFlashcards(importFile);
+            importer.importFlashcards(importFile);
         }
 
 
@@ -38,16 +44,16 @@ public class Main {
                     flashcards.removeFlashcard();
                     break;
                 case "import":
-                    flashcards.importFlashcards();
+                    importer.importFlashcards();
                     break;
                 case "export":
-                    flashcards.exportFlashcards();
+                    exporter.exportFlashcards();
                     break;
                 case "ask":
                     flashcards.askFlashcards();
                     break;
                 case "log":
-                    flashcards.saveLog();
+                    flashcards.getLog().saveLog();
                     break;
                 case "hardest card":
                     flashcards.getHardestCard();
@@ -66,7 +72,7 @@ public class Main {
 
 
         if (exportFile != null) {
-            flashcards.exportFlashcards(exportFile);
+            exporter.exportFlashcards(exportFile);
         }
 
     }
